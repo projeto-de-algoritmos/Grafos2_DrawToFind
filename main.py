@@ -73,12 +73,30 @@ class Vortex:
     pygame.display.update()
 
     
+def make_field():
+  global vertices
+
+  for i in range(ROWS):
+    cols = []
+    for j in range(COLUMNS):
+      cols.append(Vortex(i, j, WIDTH // ROWS))
+    vertices.append(cols)
+
+  for i in range(ROWS):
+    for j in range(COLUMNS):
+      vertices[i][j].see_neighbours(vertices)
+
+def reset():
+  for i in range(ROWS):
+    for j in range(COLUMNS):
+      vertices[i][j].visited = False
+
 
 
 while TESTE:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            TESTE = False
-    
-    display.blit(initial_art, (0,0))        
-    pygame.display.update()
+  for event in pygame.event.get():
+    if event.type == pygame.QUIT:
+      TESTE = False
+  
+  display.blit(initial_art, (0,0))        
+  pygame.display.update()
