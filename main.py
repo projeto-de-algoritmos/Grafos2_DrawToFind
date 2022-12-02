@@ -8,7 +8,7 @@ HEIGHT = 480
 TESTE = True
 ALG_RUN = False 
 menu_x, menu_y = 720, 480
-BLOCK_SIZE = 20                 # tamanho do block
+BLOCK_SIZE = 1                  # tamanho do block
 ROWS = WIDTH // BLOCK_SIZE      # quantidade de linhas
 COLUMNS = HEIGHT // BLOCK_SIZE
 vertices = []
@@ -70,17 +70,18 @@ def draw_main_menu():
         # if event.key == pygame.K_s:
         #   pygame.quit()
         #   sys.exit()
-      if event.type == pygame.MOUSEBUTTONDOWN:
-        pos = pygame.mouse.get_pos()
+      if event.type == pygame.MOUSEMOTION:
+        if pygame.mouse.get_pressed()[0]==True:
+          pos = pygame.mouse.get_pos()
 
-        row = (pos[0]) // BLOCK_SIZE
-        col = (pos[1]) // BLOCK_SIZE      
+          row = (pos[0]) // BLOCK_SIZE
+          col = (pos[1]) // BLOCK_SIZE      
 
-        print(row, col, len(vertices))
-        vertices[row][col].is_vortex = False
-        vertices[row][col].color = WHITE
-        vertices[row][col].draw_vortex(display)
-        pygame.display.update()
+          print(row, col, len(vertices))
+          vertices[row][col].is_vortex = False
+          vertices[row][col].color = WHITE
+          vertices[row][col].draw_vortex(display)
+          pygame.display.update()
 
 
     pygame.display.update()
