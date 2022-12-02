@@ -6,6 +6,7 @@ import random
 WIDTH = 100                     # tamanho da tela(quanto maior, mais lento)
 HEIGHT = 100
 TESTE = True
+ALG_RUN = False 
 #USE_RANDOM_COLOR = False
 menu_x, menu_y = 720, 480
 BLOCK_SIZE = 20                 # tamanho do block
@@ -30,8 +31,94 @@ pygame.display.set_caption("Draw to Find")
 pygame.mixer.music.load('assets/RetroFunk.mp3')
 pygame.mixer.music.play(-1)
 
-initial_art = pygame.image.load('assets/img/8bit.jpg').convert_alpha()
-initial_art = pygame.transform.scale(initial_art,(WIDTH, HEIGHT))
+initial_art = pygame.image.load('assets/img/8bit.PNG').convert_alpha()
+initial_art = pygame.transform.scale(initial_art,(menu_x, menu_y))
+
+options_art = pygame.image.load('assets/img/room.PNG').convert_alpha()
+options_art = pygame.transform.scale(options_art,(menu_x, menu_y))
+
+
+
+'''MENUS'''
+def draw_text(text, font, color, scr, x, y):
+  title = font.render(text, True, color)
+  rect = title.get_rect(center=(x, y))
+  scr.blit(title, rect)
+
+def draw_main_menu():
+  pygame.display.update()
+  while True:
+    display.blit(initial_art, (0,0))  
+    font70 = pygame.font.Font('assets/title-font.ttf', 70)
+    font30 = pygame.font.Font('assets/title-font.ttf', 40)
+    
+    draw_text("Draw to Find", font70, BLACK, display, 360, 150)
+    draw_text("Clique na tela para iniciar", font30, BLACK, display, 360, 250)
+    draw_text("O - Opcoes", font30, BLACK, display, 360, 320)
+    draw_text("S - Sair", font30, BLACK, display, 360, 380)
+
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_o:
+          draw_options_menu()
+        if event.key == pygame.K_s:
+          pygame.quit()
+          sys.exit()
+      #if event.type == pygame.MOUSEBUTTONDOWN:
+        #draw_start_menu()
+
+    pygame.display.update()
+    
+
+def draw_options_menu():
+  pygame.display.update()
+  global BLOCK_SIZE, ALG_RUN, ROWS, COLUMNS
+  b, d = "DIJKSTRA", "ESTRELA"
+  FPS = 200
+  while True:
+    clock.tick(FPS)
+    display.blit(options_art, (0,0))
+    font40 = pygame.font.Font('assets/title-font.ttf', 50)
+    font20 = pygame.font.Font('assets/title-font.ttf', 20)
+    font24 = pygame.font.Font('assets/title-font.ttf', 24)
+    font_obs = pygame.font.Font('assets/title-font.ttf', 17)
+    draw_text("Opções:", font40, BLACK, display, 330, 55)
+    draw_text("K/L Tamanho do pixel:", font24, BLACK, display, 330, 155)
+    draw_text(f"{BLOCK_SIZE}", font24, BLUE, display, 510, 155)
+    draw_text("(K = -   L = +)", font_obs, BLACK, display, 330, 185)
+    draw_text("B/D Algoritmo usado: ", font24, BLACK, display, 330, 240)
+    draw_text(f"{b if not ALG_RUN else d}", font24, BLUE, display, 575, 240)
+    draw_text("V - Voltar", font20, BLACK, display, 100, 440)
+    
+    
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_v:
+          draw_main_menu()
+        #if event.key == pygame.K_r:
+          #draw_resolution_menu()
+        if event.key == pygame.K_l:
+          BLOCK_SIZE += 1 if BLOCK_SIZE < 40 else 0
+          pygame.display.update()
+        if event.key == pygame.K_k:
+          BLOCK_SIZE -= 1 if BLOCK_SIZE > 1 else 0
+          pygame.display.update()
+        if event.key == pygame.K_b:
+          ALG_RUN = False
+          pygame.display.update()
+        if event.key == pygame.K_d:
+          ALG_RUN = True
+          pygame.display.update()
+    
+    ROWS = WIDTH // BLOCK_SIZE
+    COLUMNS = HEIGHT // BLOCK_SIZE    
+    pygame.display.update()
 
 class Vortex:
   def __init__(self, row, col, width, weight) -> None:
@@ -97,11 +184,6 @@ make_field()
 print(vertices[1][1].neighbours[0])
 
 
-while TESTE:
-
-  for event in pygame.event.get():
-    if event.type == pygame.QUIT:
-      TESTE = False
+if __name__ == '__main__':
   
-  display.blit(initial_art, (0,0))        
-  pygame.display.update()
+  draw_main_menu()
