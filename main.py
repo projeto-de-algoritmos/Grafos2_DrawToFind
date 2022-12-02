@@ -3,11 +3,10 @@ import sys
 import random
 
 """CONFIGURAÇÔES"""
-WIDTH = 100                     # tamanho da tela(quanto maior, mais lento)
-HEIGHT = 100
+WIDTH = 720                     # tamanho da tela(quanto maior, mais lento)
+HEIGHT = 480
 TESTE = True
 ALG_RUN = False 
-#USE_RANDOM_COLOR = False
 menu_x, menu_y = 720, 480
 BLOCK_SIZE = 20                 # tamanho do block
 ROWS = WIDTH // BLOCK_SIZE      # quantidade de linhas
@@ -25,11 +24,12 @@ CIAN = (52, 78, 91)
 PINK = (224, 20, 227)
 
 pygame.init()
-display = pygame.display.set_mode((menu_x, menu_y))
+# display = pygame.display.set_mode((menu_x, menu_y))
+display = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 pygame.display.set_caption("Draw to Find")
 pygame.mixer.music.load('assets/RetroFunk.mp3')
-pygame.mixer.music.play(-1)
+# pygame.mixer.music.play(-1)
 
 initial_art = pygame.image.load('assets/img/8bit.PNG').convert_alpha()
 initial_art = pygame.transform.scale(initial_art,(menu_x, menu_y))
@@ -46,29 +46,42 @@ def draw_text(text, font, color, scr, x, y):
   scr.blit(title, rect)
 
 def draw_main_menu():
+  # display = pygame.display.set_mode((WIDTH, HEIGHT))
+  display.fill(CIAN)
   pygame.display.update()
   while True:
-    display.blit(initial_art, (0,0))  
-    font70 = pygame.font.Font('assets/title-font.ttf', 70)
-    font30 = pygame.font.Font('assets/title-font.ttf', 40)
+    # display.blit(initial_art, (0,0))  
+    # font70 = pygame.font.Font('assets/title-font.ttf', 70)
+    # font30 = pygame.font.Font('assets/title-font.ttf', 40)
     
-    draw_text("Draw to Find", font70, BLACK, display, 360, 150)
-    draw_text("Clique na tela para iniciar", font30, BLACK, display, 360, 250)
-    draw_text("O - Opcoes", font30, BLACK, display, 360, 320)
-    draw_text("S - Sair", font30, BLACK, display, 360, 380)
+    # draw_text("Draw to Find", font70, BLACK, display, 360, 150)
+    # draw_text("Clique na tela para iniciar", font30, BLACK, display, 360, 250)
+    # draw_text("O - Opcoes", font30, BLACK, display, 360, 320)
+    # draw_text("S - Sair", font30, BLACK, display, 360, 380)
 
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         pygame.quit()
         sys.exit()
       if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_o:
-          draw_options_menu()
-        if event.key == pygame.K_s:
-          pygame.quit()
-          sys.exit()
-      #if event.type == pygame.MOUSEBUTTONDOWN:
-        #draw_start_menu()
+        pass
+        # if event.key == pygame.K_o:
+        #   draw_options_menu()
+        # if event.key == pygame.K_s:
+        #   pygame.quit()
+        #   sys.exit()
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        pos = pygame.mouse.get_pos()
+
+        row = (pos[0]) // BLOCK_SIZE
+        col = (pos[1]) // BLOCK_SIZE      
+
+        print(row, col, len(vertices))
+        vertices[row][col].is_vortex = False
+        vertices[row][col].color = WHITE
+        vertices[row][col].draw_vortex(display)
+        pygame.display.update()
+
 
     pygame.display.update()
     
@@ -93,7 +106,7 @@ def draw_options_menu():
     draw_text(f"{b if not ALG_RUN else d}", font24, BLUE, display, 575, 240)
     draw_text("V - Voltar", font20, BLACK, display, 100, 440)
     
-    
+     
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         pygame.quit()
@@ -157,7 +170,7 @@ class Vortex:
         self.neighbours.append([field[self.x][self.y - 1], self.weight])     # vizinho de cima
   
   def draw_vortex(self, display):
-    pygame.draw.rect(display, self.color, (self.row, self.col, self.width, self.width))
+    pygame.draw.rect(display, self.color, (self.row, self.col, self.size, self.size))
     pygame.display.update()
 
     
@@ -185,5 +198,4 @@ print(vertices[1][1].neighbours[0])
 
 
 if __name__ == '__main__':
-  
   draw_main_menu()
