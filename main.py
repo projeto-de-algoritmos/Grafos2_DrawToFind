@@ -2,6 +2,7 @@ import pygame
 import sys
 import time
 import random
+from collections import deque
 from queue import PriorityQueue
 
 """CONFIGURAÇÔES"""
@@ -73,7 +74,7 @@ def draw_main_menu():
         sys.exit()
       if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_SPACE:
-          dijkstra(vertices[4][4], vertices[10][10])
+          dijkstra(vertices[1][1], vertices[60][30])
         if event.key == pygame.K_r:
           reset('all')
         # if event.key == pygame.K_o:
@@ -187,32 +188,33 @@ class Vortex:
     pygame.display.update()
 
 def dijkstra(node, end):
-  distancia = [float('inf') for _ in range(len(vertices))]
+  distancia = [float('inf') for _ in range(len(vertices) ** 2)]
   distancia[node.id] = 0
-
-  queue = PriorityQueue()
-  queue.put((0, node))
+  queue = deque()
+  queue.append((0, node))
   node.visited = True
 
 
   while queue:
-    dist, s = queue.get()
+    dist, s = queue.popleft()
     if s == end:
       aux = s
       while aux.previous:
-        # print(aux.previous.x, aux.previous.x)
         caminho.append(aux.previous)
         aux = aux.previous
     for i in s.neighbours:
       if not i.visited and i.is_vortex:
-        i.visited = True
-        i.previous = s
-        queue.put((0, i))
-        i.color = BLACK
-        i.draw_vortex()
-        # time.sleep(0.001)
-    
-  # print(caminho)
+        old_cost = distancia[i.id]
+        new_cost = distancia[s.id] + dist
+        if new_cost < old_cost:
+          queue.append((new_cost, i))
+          distancia[i.id] = new_cost
+          i.visited = True
+          i.previous = s
+          i.color = WHITE
+          i.draw_vortex()
+          time.sleep(0.001)
+
   reset('path')
   
 
@@ -224,7 +226,7 @@ def make_field():
     cols = []
     for j in range(COLUMNS):
       cols.append(Vortex(i, j, WIDTH // ROWS, display, id_cont // BLOCK_SIZE))
-      id_cont += 1
+      id_cont += BLOCK_SIZE
     vertices.append(cols)
 
   for i in range(ROWS):
