@@ -1,5 +1,6 @@
 import pygame
 import sys
+import time
 import random
 from queue import PriorityQueue
 
@@ -13,6 +14,8 @@ BLOCK_SIZE = 10                  # tamanho do block
 ROWS = WIDTH // BLOCK_SIZE      # quantidade de linhas
 COLUMNS = HEIGHT // BLOCK_SIZE
 vertices = []
+caminho = []
+distancia = []
 
 '''CORES'''
 BLACK = (0, 0, 0)
@@ -23,6 +26,9 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 102)
 CIAN = (52, 78, 91)
 PINK = (224, 20, 227)
+
+def random_color():
+  return random.randrange(0, 255), random.randrange(0, 255), random.randrange(0, 255)
 
 pygame.init()
 # display = pygame.display.set_mode((menu_x, menu_y))
@@ -65,7 +71,10 @@ def draw_main_menu():
         pygame.quit()
         sys.exit()
       if event.type == pygame.KEYDOWN:
-        pass
+        if event.key == pygame.K_SPACE:
+          dijkstra(vertices[4][4], vertices[10][10])
+        if event.key == pygame.K_r:
+          reset('all')
         # if event.key == pygame.K_o:
         #   draw_options_menu()
         # if event.key == pygame.K_s:
@@ -76,19 +85,14 @@ def draw_main_menu():
         row = (pos[0]) // BLOCK_SIZE
         col = (pos[1]) // BLOCK_SIZE   
         if pygame.mouse.get_pressed()[0]:
-          print(row, col, len(vertices))
           vertices[row][col].is_vortex = False
-          vertices[row][col].color = WHITE
-          vertices[row][col].draw_vortex(display)
-          pygame.display.update()
+          vertices[row][col].color = BLACK
+          vertices[row][col].draw_vortex()
         if pygame.mouse.get_pressed()[2]:
           vertices[row][col].is_vortex = True
           vertices[row][col].color = CIAN
-          vertices[row][col].draw_vortex(display)
-          pygame.display.update()
-
-          
-
+          vertices[row][col].draw_vortex()
+        pygame.display.update()
     pygame.display.update()
     
 
@@ -140,17 +144,18 @@ def draw_options_menu():
     pygame.display.update()
 
 class Vortex:
-  def __init__(self, row, col, width, weight) -> None:
-    self.weight = weight
+  def __init__(self, row, col, width, display) -> None:
     self.row = row * width
     self.col = col * width
     self.x = row
     self.y = col
-    self.color = PINK
+    self.color = BLACK
     self.size = width
+    self.display = display
     self.neighbours = []
     self.is_vortex = True
     self.visited = False
+    self.previous = None
     self.is_wall()
 
   def is_wall(self):
@@ -167,17 +172,47 @@ class Vortex:
   def see_neighbours(self, field):
     if (self.x > 0 and self.x < ROWS - 2) and (self.y > 0 and self.y < COLUMNS - 2):
       if field[self.x + 1][self.y].is_vortex:
-        self.neighbours.append([field[self.x + 1][self.y], self.weight])     # vizinho da direita
+        self.neighbours.append(field[self.x + 1][self.y])     # vizinho da direita
       if field[self.x - 1][self.y].is_vortex:
-        self.neighbours.append([field[self.x - 1][self.y], self.weight])     # vizinho da esquerda
+        self.neighbours.append(field[self.x - 1][self.y])     # vizinho da esquerda
       if field[self.x][self.y + 1].is_vortex:
-        self.neighbours.append([field[self.x][self.y + 1], self.weight])     # vizinho de baixo
+        self.neighbours.append(field[self.x][self.y + 1])     # vizinho de baixo
       if field[self.x][self.y - 1].is_vortex:
-        self.neighbours.append([field[self.x][self.y - 1], self.weight])     # vizinho de cima
+        self.neighbours.append(field[self.x][self.y - 1])     # vizinho de cima
   
-  def draw_vortex(self, display):
-    pygame.draw.rect(display, self.color, (self.row, self.col, self.size, self.size))
+  def draw_vortex(self):
+    pygame.draw.rect(self.display, self.color, (self.row, self.col, self.size, self.size))
     pygame.display.update()
+
+def dijkstra(node, end):
+  print(node.visited)
+  queue = []
+  distancia = [float('inf') for _ in range(len(vertices))]
+  queue.append(node)
+  node.visited = True
+  print(type(float('inf')))
+
+  while queue:
+    s = queue.pop()
+    if s == end:
+      aux = s
+      while aux.previous:
+        # print(aux.previous.x, aux.previous.x)
+        caminho.append(aux.previous)
+        aux = aux.previous
+    for i in s.neighbours:
+      if not i.visited and i.is_vortex:
+        i.visited = True
+        i.previous = s
+        queue.append(i)
+        i.color = BLACK
+        i.draw_vortex()
+        # time.sleep(0.001)
+    
+  # print(caminho)
+  reset('path')
+  
+
 
 def make_field():
   global vertices
@@ -185,22 +220,32 @@ def make_field():
   for i in range(ROWS):
     cols = []
     for j in range(COLUMNS):
-      cols.append(Vortex(i, j, WIDTH // ROWS, 1))
+      cols.append(Vortex(i, j, WIDTH // ROWS, display))
     vertices.append(cols)
 
   for i in range(ROWS):
     for j in range(COLUMNS):
       vertices[i][j].see_neighbours(vertices)
 
-def reset():
+def reset(mode):
+  global caminho
+  caminho = [] if mode == 'all' else caminho
   for i in range(ROWS):
     for j in range(COLUMNS):
-      vertices[i][j].visited = False
+      if vertices[i][j].is_vortex:
+        if mode == 'all':
+          vertices[i][j].visited = False
+          vertices[i][j].color = CIAN
+          vertices[i][j].draw_vortex()
+        elif mode == 'path':
+          if vertices[i][j] not in caminho:
+            vertices[i][j].visited = False
+            vertices[i][j].color = CIAN
+            vertices[i][j].draw_vortex()
+      
 
-make_field()
-
-print(vertices[1][1].neighbours[0])
 
 
 if __name__ == '__main__':
+  make_field()
   draw_main_menu()
