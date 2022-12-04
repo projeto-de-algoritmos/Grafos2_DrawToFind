@@ -158,6 +158,7 @@ class Vortex:
     self.neighbours = []
     self.is_vortex = True
     self.visited = False
+    self.is_path = False
     self.previous = None
     self.is_wall()
 
@@ -186,6 +187,10 @@ class Vortex:
   def draw_vortex(self):
     pygame.draw.rect(self.display, self.color, (self.row, self.col, self.size, self.size))
     pygame.display.update()
+  
+  def draw_path_cell(self):
+    pygame.draw.rect(self.display, CIAN, (self.row, self.col, self.size, self.size), border_radius=5)
+    pygame.display.update()
 
 def dijkstra(node, end):
   distancia = [float('inf') for _ in range(len(vertices) ** 2)]
@@ -199,7 +204,9 @@ def dijkstra(node, end):
     dist, s = queue.popleft()
     if s == end:
       aux = s
+      aux.is_path = True
       while aux.previous:
+        aux.is_path = True
         caminho.append(aux.previous)
         aux = aux.previous
     for i in s.neighbours:
@@ -213,7 +220,7 @@ def dijkstra(node, end):
           i.previous = s
           i.color = WHITE
           i.draw_vortex()
-          time.sleep(0.001)
+          # time.sleep(0.001)
 
   reset('path')
   
@@ -233,9 +240,11 @@ def make_field():
     for j in range(COLUMNS):
       vertices[i][j].see_neighbours(vertices)
 
+
 def reset(mode):
   global caminho
   caminho = [] if mode == 'all' else caminho
+
   for i in range(ROWS):
     for j in range(COLUMNS):
       if vertices[i][j].is_vortex:
@@ -248,10 +257,10 @@ def reset(mode):
             vertices[i][j].visited = False
             vertices[i][j].color = CIAN
             vertices[i][j].draw_vortex()
+          else:
+            vertices[i][j].draw_path_cell()
+
       
-
-
-
 if __name__ == '__main__':
   make_field()
   draw_main_menu()
