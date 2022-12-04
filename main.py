@@ -16,6 +16,7 @@ COLUMNS = HEIGHT // BLOCK_SIZE
 vertices = []
 caminho = []
 distancia = []
+id_cont = 0
 
 '''CORES'''
 BLACK = (0, 0, 0)
@@ -144,9 +145,10 @@ def draw_options_menu():
     pygame.display.update()
 
 class Vortex:
-  def __init__(self, row, col, width, display) -> None:
+  def __init__(self, row, col, width, display, id) -> None:
     self.row = row * width
     self.col = col * width
+    self.id = id
     self.x = row
     self.y = col
     self.color = BLACK
@@ -185,15 +187,16 @@ class Vortex:
     pygame.display.update()
 
 def dijkstra(node, end):
-  print(node.visited)
-  queue = []
   distancia = [float('inf') for _ in range(len(vertices))]
-  queue.append(node)
+  distancia[node.id] = 0
+
+  queue = PriorityQueue()
+  queue.put((0, node))
   node.visited = True
-  print(type(float('inf')))
+
 
   while queue:
-    s = queue.pop()
+    dist, s = queue.get()
     if s == end:
       aux = s
       while aux.previous:
@@ -204,7 +207,7 @@ def dijkstra(node, end):
       if not i.visited and i.is_vortex:
         i.visited = True
         i.previous = s
-        queue.append(i)
+        queue.put((0, i))
         i.color = BLACK
         i.draw_vortex()
         # time.sleep(0.001)
@@ -215,12 +218,13 @@ def dijkstra(node, end):
 
 
 def make_field():
-  global vertices
+  global vertices, id_cont
 
   for i in range(ROWS):
     cols = []
     for j in range(COLUMNS):
-      cols.append(Vortex(i, j, WIDTH // ROWS, display))
+      cols.append(Vortex(i, j, WIDTH // ROWS, display, id_cont // BLOCK_SIZE))
+      id_cont += 1
     vertices.append(cols)
 
   for i in range(ROWS):
