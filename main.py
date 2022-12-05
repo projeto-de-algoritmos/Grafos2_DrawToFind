@@ -34,7 +34,7 @@ def random_color():
 
 pygame.init()
 # display = pygame.display.set_mode((menu_x, menu_y))
-display = pygame.display.set_mode((WIDTH, HEIGHT))
+display = pygame.display.set_mode((WIDTH, HEIGHT), flags=pygame.NOFRAME)
 clock = pygame.time.Clock()
 pygame.display.set_caption("Draw to Find")
 pygame.mixer.music.load('assets/RetroFunk.mp3')
@@ -45,6 +45,107 @@ initial_art = pygame.transform.scale(initial_art,(menu_x, menu_y))
 
 options_art = pygame.image.load('assets/img/room.PNG').convert_alpha()
 options_art = pygame.transform.scale(options_art,(menu_x, menu_y))
+
+
+
+'''MENUS'''
+def draw_text(text, font, color, scr, x, y):
+  title = font.render(text, True, color)
+  rect = title.get_rect(center=(x, y))
+  scr.blit(title, rect)
+
+def draw_main_menu():
+  # display = pygame.display.set_mode((WIDTH, HEIGHT))
+  display.fill(CIAN)
+  pygame.display.update()
+  while True:
+    # display.blit(initial_art, (0,0))  
+    # font70 = pygame.font.Font('assets/title-font.ttf', 70)
+    # font30 = pygame.font.Font('assets/title-font.ttf', 40)
+    
+    # draw_text("Draw to Find", font70, BLACK, display, 360, 150)
+    # draw_text("Clique na tela para iniciar", font30, BLACK, display, 360, 250)
+    # draw_text("O - Opcoes", font30, BLACK, display, 360, 320)
+    # draw_text("S - Sair", font30, BLACK, display, 360, 380)
+
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_SPACE:
+          dijkstra(vertices[(display.get_width() // BLOCK_SIZE) // 2 - 1][(display.get_height() // BLOCK_SIZE) // 2 - 1], vertices[60][30])
+          # print(vertices.__len__(), (display.get_width() // BLOCK_SIZE) // 2 - 1, (display.get_height() // BLOCK_SIZE) // 2 - 1)
+        if event.key == pygame.K_r:
+          reset('all')
+        # if event.key == pygame.K_o:
+        #   draw_options_menu()
+        # if event.key == pygame.K_s:
+        #   pygame.quit()
+        #   sys.exit()
+      if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN:
+        pos = pygame.mouse.get_pos()
+        row = (pos[0]) // BLOCK_SIZE
+        col = (pos[1]) // BLOCK_SIZE   
+        if pygame.mouse.get_pressed()[0]:
+          vertices[row][col].is_vortex = False
+          vertices[row][col].color = BLACK
+          vertices[row][col].draw_vortex()
+        if pygame.mouse.get_pressed()[2]:
+          vertices[row][col].is_vortex = True
+          vertices[row][col].color = CIAN
+          vertices[row][col].draw_vortex()
+        pygame.display.update()
+    pygame.display.update()
+    
+
+def draw_options_menu():
+  pygame.display.update()
+  global BLOCK_SIZE, ALG_RUN, ROWS, COLUMNS
+  d = "DIJKSTRA"
+  FPS = 200
+  while True:
+    clock.tick(FPS)
+    display.blit(options_art, (0,0))
+    font40 = pygame.font.Font('assets/title-font.ttf', 50)
+    font20 = pygame.font.Font('assets/title-font.ttf', 20)
+    font24 = pygame.font.Font('assets/title-font.ttf', 24)
+    font_obs = pygame.font.Font('assets/title-font.ttf', 17)
+    draw_text("Opções:", font40, BLACK, display, 330, 55)
+    draw_text("K/L Tamanho do pixel:", font24, BLACK, display, 330, 155)
+    draw_text(f"{BLOCK_SIZE}", font24, BLUE, display, 510, 155)
+    draw_text("(K = -   L = +)", font_obs, BLACK, display, 330, 185)
+    draw_text("B/D Algoritmo usado: ", font24, BLACK, display, 330, 240)
+    draw_text(f"{b if not ALG_RUN else d}", font24, BLUE, display, 575, 240)
+    draw_text("V - Voltar", font20, BLACK, display, 100, 440)
+    
+     
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_v:
+          draw_main_menu()
+        #if event.key == pygame.K_r:
+          #draw_resolution_menu()
+        if event.key == pygame.K_l:
+          BLOCK_SIZE += 1 if BLOCK_SIZE < 40 else 0
+          pygame.display.update()
+        if event.key == pygame.K_k:
+          BLOCK_SIZE -= 1 if BLOCK_SIZE > 1 else 0
+          pygame.display.update()
+        if event.key == pygame.K_b:
+          ALG_RUN = False
+          pygame.display.update()
+        if event.key == pygame.K_d:
+          ALG_RUN = True
+          pygame.display.update()
+    
+    ROWS = WIDTH // BLOCK_SIZE
+    COLUMNS = HEIGHT // BLOCK_SIZE    
+    pygame.display.update()
+
 class Vortex:
   def __init__(self, row, col, width, display, id) -> None:
     self.row = row * width
@@ -109,6 +210,8 @@ def dijkstra(node, end):
         aux.is_path = True
         caminho.append(aux.previous)
         aux = aux.previous
+      reset('path')
+      return
     for i in s.neighbours:
       if not i.visited and i.is_vortex:
         old_cost = distancia[i.id]
@@ -124,6 +227,7 @@ def dijkstra(node, end):
 
   reset('path')
   
+
 
 def make_field():
   global vertices, id_cont
@@ -159,124 +263,7 @@ def reset(mode):
           else:
             vertices[i][j].draw_path_cell()
 
-'''MENUS'''
-def draw_text(text, font, color, scr, x, y):
-  title = font.render(text, True, color)
-  rect = title.get_rect(center=(x, y))
-  scr.blit(title, rect)
-
-def main_menu():
-  
-  display.fill(CIAN)
-  pygame.display.update()
-  while True:
-    # display.blit(initial_art, (0,0))  
-    font70 = pygame.font.Font('assets/title-font.ttf', 70)
-    font30 = pygame.font.Font('assets/title-font.ttf', 40)
-    
-    draw_text("Draw to Find", font70, WHITE, display, 360, 150)
-    draw_text("Clique na tela para iniciar", font30, BLACK, display, 360, 250)
-
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        pygame.quit()
-        sys.exit()
-      if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_SPACE:
-          dijkstra(vertices[4][4], vertices[10][10])
-      if event.type == pygame.MOUSEBUTTONDOWN:
-        draw_menu()
-    
-    pygame.display.update()
-
-def draw_menu():
-  pygame.display.update()
-  display = pygame.display.set_mode((WIDTH, HEIGHT))
-  fim_alg = True
-  display.fill(CIAN)
-  make_field()
-  while True:
-    font30 = pygame.font.Font('assets/title-font.ttf', 30)
-    font20 = pygame.font.Font('assets/title-font.ttf', 20)
-    font15 = pygame.font.Font('assets/title-font.ttf', 15)
-    draw_text("Desenhe as paredes do labirinto:", font30, BLACK, display, 310, 55)
-    draw_text("1. Botão direito do mouse para desenhar", font20, BLACK, display, 260, 110)
-    draw_text("2. Botão esquerdo do mouse para apagar", font20, BLACK, display, 260, 150)
-    draw_text("3. Terminou o desenho? Aperte SPACE para ir para a próxima fase", font15, BLACK, display, 340, 190)
-    #draw_text("3. Clique 'R' para resetar caminho (provisório)", font20, BLACK, display, 340, 190)
-    draw_text("V - voltar", font20, BLACK, display, 110, 400)
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        pygame.quit()
-        sys.exit()
-      if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_v:
-          main_menu()
-        if event.key == pygame.K_r:
-          reset('all')
-      if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN and fim_alg:
-        fim_alg = False
-        #display.fill(CIAN)
-        pos = pygame.mouse.get_pos()
-        row = (pos[0]) // BLOCK_SIZE
-        col = (pos[1]) // BLOCK_SIZE   
-        if pygame.mouse.get_pressed()[0]:
-          vertices[row][col].is_vortex = False
-          vertices[row][col].color = BLACK
-          vertices[row][col].draw_vortex()
-        if pygame.mouse.get_pressed()[2]:
-          vertices[row][col].is_vortex = True
-          vertices[row][col].color = CIAN
-          vertices[row][col].draw_vortex()
-      if event.type == pygame.KEYUP:
-        if event.key == pygame.K_SPACE:
-          start_destination_point()
-      if fim_alg:
-        pygame.display.update()
-
-def start_destination_point():
-  pygame.display.update()
-  display.fill(CIAN)
-  fim_alg = True
-  while True:
-    font30 = pygame.font.Font('assets/title-font.ttf', 30)
-    font20 = pygame.font.Font('assets/title-font.ttf', 20)
-    
-    draw_text("Determine o ponto de busca do labirinto:", font30, BLACK, display, 310, 55)
-    #draw_text("3. Clique 'R' para resetar caminho (provisório)", font20, BLACK, display, 340, 190)
-    draw_text("V - voltar", font20, BLACK, display, 110, 400)
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        pygame.quit()
-        sys.exit()
-      if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_v:
-          main_menu()
-        if event.key == pygame.K_r:
-          reset('all')
-      if event.type == pygame.MOUSEBUTTONDOWN: 
-        #display.fill(CIAN)
-        xSearching, ySearching = pygame.mouse.get_pos()
-      if fim_alg:
-        pygame.display.update()
-    
-    draw_text("Determine o ponto de partida do caminho:", font30, BLACK, display, 310, 75)
-    for event in pygame.event.get():
-      if event.type == pygame.QUIT:
-        pygame.quit()
-        sys.exit()
-      if event.type == pygame.KEYDOWN:
-        if event.key == pygame.K_v:
-          main_menu()
-        if event.key == pygame.K_r:
-          reset('all')
-      if event.type == pygame.MOUSEBUTTONDOWN:
-        #display.fill(CIAN)
-        xStart, yStart = pygame.mouse.get_pos()
-    
-    dijkstra(vertices[xSearching][ySearching], vertices[xStart][yStart])
-    
       
 if __name__ == '__main__':
   make_field()
-  main_menu()
+  draw_main_menu()
