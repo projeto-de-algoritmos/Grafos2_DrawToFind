@@ -176,8 +176,6 @@ def main_menu():
     
     draw_text("Draw to Find", font70, WHITE, display, 360, 150)
     draw_text("Clique na tela para iniciar", font30, BLACK, display, 360, 250)
-    # draw_text("O - Opcoes", font30, BLACK, display, 360, 320)
-    # draw_text("S - Sair", font30, BLACK, display, 360, 380)
 
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
@@ -230,11 +228,54 @@ def draw_menu():
           vertices[row][col].is_vortex = True
           vertices[row][col].color = CIAN
           vertices[row][col].draw_vortex()
-      #if event.type == pygame.KEYUP:
-        #if event.key == pygame.K_SPACE:
-          #search_destination()
+      if event.type == pygame.KEYUP:
+        if event.key == pygame.K_SPACE:
+          start_destination_point()
       if fim_alg:
         pygame.display.update()
+
+def start_destination_point():
+  pygame.display.update()
+  display.fill(CIAN)
+  fim_alg = True
+  while True:
+    font30 = pygame.font.Font('assets/title-font.ttf', 30)
+    font20 = pygame.font.Font('assets/title-font.ttf', 20)
+    
+    draw_text("Determine o ponto de busca do labirinto:", font30, BLACK, display, 310, 55)
+    #draw_text("3. Clique 'R' para resetar caminho (provisório)", font20, BLACK, display, 340, 190)
+    draw_text("V - voltar", font20, BLACK, display, 110, 400)
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_v:
+          main_menu()
+        if event.key == pygame.K_r:
+          reset('all')
+      if event.type == pygame.MOUSEBUTTONDOWN: 
+        #display.fill(CIAN)
+        xSearching, ySearching = pygame.mouse.get_pos()
+      if fim_alg:
+        pygame.display.update()
+    
+    draw_text("Determine o ponto de partida do caminho:", font30, BLACK, display, 310, 75)
+    for event in pygame.event.get():
+      if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+      if event.type == pygame.KEYDOWN:
+        if event.key == pygame.K_v:
+          main_menu()
+        if event.key == pygame.K_r:
+          reset('all')
+      if event.type == pygame.MOUSEBUTTONDOWN:
+        #display.fill(CIAN)
+        xStart, yStart = pygame.mouse.get_pos()
+    
+    dijkstra(vertices[xSearching][ySearching], vertices[xStart][yStart])
+    
       
 if __name__ == '__main__':
   make_field()
