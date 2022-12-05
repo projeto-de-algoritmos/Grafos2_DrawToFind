@@ -18,6 +18,10 @@ vertices = []
 caminho = []
 distancia = []
 id_cont = 0
+draw_mode = True
+existe_inicio = False
+existe_fim = False
+
 
 '''CORES'''
 BLACK = (0, 0, 0)
@@ -50,18 +54,19 @@ options_art = pygame.transform.scale(options_art,(menu_x, menu_y))
 
 '''MENUS'''
 def draw_text(text, font, color, scr, x, y):
-  title = font.render(text, True, color)
+  title = font.render(text, True, color, None)
   rect = title.get_rect(center=(x, y))
   scr.blit(title, rect)
 
 def draw_main_menu():
   # display = pygame.display.set_mode((WIDTH, HEIGHT))
+  global draw_mode, existe_fim, existe_inicio
   display.fill(CIAN)
   pygame.display.update()
   while True:
     # display.blit(initial_art, (0,0))  
-    # font70 = pygame.font.Font('assets/title-font.ttf', 70)
-    # font30 = pygame.font.Font('assets/title-font.ttf', 40)
+    font70 = pygame.font.Font('assets/title-font.ttf', 70)
+    font30 = pygame.font.Font('assets/title-font.ttf', 40)
     
     # draw_text("Draw to Find", font70, BLACK, display, 360, 150)
     # draw_text("Clique na tela para iniciar", font30, BLACK, display, 360, 250)
@@ -75,22 +80,28 @@ def draw_main_menu():
       if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_SPACE:
           dijkstra(vertices[(display.get_width() // BLOCK_SIZE) // 2 - 1][(display.get_height() // BLOCK_SIZE) // 2 - 1], vertices[60][30])
-          # print(vertices.__len__(), (display.get_width() // BLOCK_SIZE) // 2 - 1, (display.get_height() // BLOCK_SIZE) // 2 - 1)
         if event.key == pygame.K_r:
           reset('all')
-        # if event.key == pygame.K_o:
-        #   draw_options_menu()
-        # if event.key == pygame.K_s:
-        #   pygame.quit()
-        #   sys.exit()
-      if event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN:
+        if event.key == pygame.K_m:
+          draw_mode = not draw_mode
+          print(draw_mode)
+        if event.key == pygame.K_a:
+          existe_inicio = False
+          existe_fim = False
+      if (event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN):
         pos = pygame.mouse.get_pos()
         row = (pos[0]) // BLOCK_SIZE
-        col = (pos[1]) // BLOCK_SIZE   
-        if pygame.mouse.get_pressed()[0]:
-          vertices[row][col].is_vortex = False
-          vertices[row][col].color = BLACK
-          vertices[row][col].draw_vortex()
+        col = (pos[1]) // BLOCK_SIZE
+        if pygame.mouse.get_pressed()[0] and not existe_inicio:
+          if draw_mode:
+            vertices[row][col].is_vortex = False
+            vertices[row][col].color = BLACK
+            vertices[row][col].draw_vortex()
+          else:
+            existe_inicio = False
+            vertices[row][col].is_vortex = True
+            vertices[row][col].color = GREEN
+            vertices[row][col].draw_vortex()
         if pygame.mouse.get_pressed()[2]:
           vertices[row][col].is_vortex = True
           vertices[row][col].color = CIAN
@@ -192,6 +203,8 @@ class Vortex:
   def draw_path_cell(self):
     pygame.draw.rect(self.display, CIAN, (self.row, self.col, self.size, self.size), border_radius=5)
     pygame.display.update()
+
+
 
 def dijkstra(node, end):
   distancia = [float('inf') for _ in range(len(vertices) ** 2)]
