@@ -130,6 +130,7 @@ def instructions():
     clock.tick(FPS)
     font40 = pygame.font.Font('assets/title-font.ttf', 40)
     font20 = pygame.font.Font('assets/title-font.ttf', 20)
+    font18 = pygame.font.Font('assets/title-font.ttf', 15)
     
     draw_text("Instrucoes:", font40, BLACK, display, 360, 120)
     draw_text("1. No menu inicial, clique na tela para iniciar o desenho", font20, BLACK, display, 310, 200)
@@ -137,7 +138,11 @@ def instructions():
     draw_text("3. Botão esquerdo do mouse para apagar as paredes do labirinto", font20, BLACK, display, 357, 260)
     draw_text("4. Selecione o ponto de partida e de busca no desenho", font20, BLACK, display, 300, 290)
     draw_text("5. Clique espaço para percorrer o menor caminho", font20, BLACK, display, 270, 320)
-    draw_text("v - voltar", font20, BLACK, display, 90, 450)
+    draw_text("6. Clique 'm' para alterar o modo de desenho para o modo de posição de inicio e fim", font20, BLACK, display, 458, 350)
+    draw_text("ção de inicio e fim", font20, BLACK, display, 100, 370)
+    draw_text("7. Clique 'A' para resetar os pontos de inicio e fim", font20, BLACK, display, 285, 400)
+    draw_text("8. Clique 'R' para resetar o caminho feito pelo algoritmo", font20, BLACK, display, 325, 430)
+    draw_text("v - voltar", font20, BLACK, display, 60, 460)
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         pygame.quit()
