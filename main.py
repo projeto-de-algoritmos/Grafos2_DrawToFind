@@ -69,7 +69,8 @@ def draw_main_menu():
     
     draw_text("Draw to Find", font40, BLACK, display, 270, 50)
     draw_text("(desenhe seu labirinto abaixo)", font10, BLACK, display, 270, 100)
-    draw_text("I - Instrucoes", font20, BLACK, display, 150, 450)
+    draw_text("I - Instrucoes", font20, BLACK, display, 150, 420)
+    draw_text("S - Sair", font20, BLACK, display, 87, 455)
     
 
     for event in pygame.event.get():
@@ -89,6 +90,9 @@ def draw_main_menu():
           existe_fim = False
         if event.key == pygame.K_i:
           instructions()
+        if event.key == pygame.K_s:
+          pygame.quit()
+          sys.exit()
       if (event.type == pygame.MOUSEMOTION or event.type == pygame.MOUSEBUTTONDOWN):
         pos = pygame.mouse.get_pos()
         row = (pos[0]) // BLOCK_SIZE
