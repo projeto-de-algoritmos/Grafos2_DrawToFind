@@ -6,8 +6,8 @@ from collections import deque
 from queue import PriorityQueue
 
 """CONFIGURAÇÔES"""
-WIDTH = 720                     # tamanho da tela(quanto maior, mais lento)
-HEIGHT = 480
+WIDTH = 1280                     # tamanho da tela(quanto maior, mais lento)
+HEIGHT = 500
 TESTE = True
 ALG_RUN = False 
 menu_x, menu_y = 720, 480
@@ -34,9 +34,7 @@ WHITE = (255, 255, 255)
 YELLOW = (255, 255, 102)
 CIAN = (52, 78, 91)
 PINK = (224, 20, 227)
-
-def random_color():
-  return random.randrange(0, 255), random.randrange(0, 255), random.randrange(0, 255)
+bg_color = (50, 168, 82)
 
 pygame.init()
 # display = pygame.display.set_mode((menu_x, menu_y))
@@ -57,23 +55,22 @@ options_art = pygame.transform.scale(options_art,(menu_x, menu_y))
 '''MENUS'''
 def draw_text(text, font, color, scr, x, y):
   title = font.render(text, True, color, None)
-  rect = title.get_rect(center=(x, y))
+  rect = title.get_rect(center=(x + 1, y))
   scr.blit(title, rect)
 
 def draw_main_menu():
-  # display = pygame.display.set_mode((WIDTH, HEIGHT))
   global draw_mode, existe_fim, existe_inicio, coord_fim, coord_inicio
-  display.fill(CIAN)
-  pygame.display.update()
+  display.fill(bg_color)
   while True:
-    # display.blit(initial_art, (0,0))  
-    font40 = pygame.font.Font('assets/title-font.ttf', 40)
-    font20 = pygame.font.Font('assets/title-font.ttf', 20)
-    font10 = pygame.font.Font('assets/title-font.ttf', 10)
+    pygame.display.update()
+    font40 = pygame.font.Font('assets/title-font.ttf', 60)
+    font20 = pygame.font.Font('assets/title-font.ttf', 30)
+    font10 = pygame.font.Font('assets/title-font.ttf', 25)
     
-    draw_text("Draw to Find", font40, BLACK, display, 360, 50)
-    draw_text("(desenhe seu labirinto abaixo)", font10, BLACK, display, 360, 90)
-    draw_text("I - Instrucoes", font20, BLACK, display, 100, 450)
+    draw_text("Draw to Find", font40, BLACK, display, 270, 50)
+    draw_text("(desenhe seu labirinto abaixo)", font10, BLACK, display, 270, 100)
+    draw_text("I - Instrucoes", font20, BLACK, display, 150, 450)
+    
 
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
@@ -81,7 +78,6 @@ def draw_main_menu():
         sys.exit()
       if event.type == pygame.KEYDOWN:
         if event.key == pygame.K_SPACE:
-          # dijkstra(vertices[(display.get_width() // BLOCK_SIZE) // 2 - 1][(display.get_height() // BLOCK_SIZE) // 2 - 1], vertices[60][30])
           dijkstra(vertices[coord_inicio[0]][coord_inicio[1]], vertices[coord_fim[0]][coord_fim[1]])
         if event.key == pygame.K_r:
           reset('all')
@@ -111,7 +107,7 @@ def draw_main_menu():
         if pygame.mouse.get_pressed()[2]:
           if draw_mode or existe_fim:
             vertices[row][col].is_vortex = True
-            vertices[row][col].color = CIAN
+            vertices[row][col].color = bg_color
             vertices[row][col].draw_vortex()
           else:
             coord_fim = (row, col)
@@ -120,29 +116,27 @@ def draw_main_menu():
             vertices[row][col].color = RED
             vertices[row][col].draw_vortex()
         pygame.display.update()
-    pygame.display.update()
     
 def instructions():
   
-  display.fill(CIAN)
+  display.fill(bg_color)
   FPS = 200
   while True:
     clock.tick(FPS)
     font40 = pygame.font.Font('assets/title-font.ttf', 40)
-    font20 = pygame.font.Font('assets/title-font.ttf', 20)
+    font20 = pygame.font.Font('assets/title-font.ttf', 24)
     font18 = pygame.font.Font('assets/title-font.ttf', 15)
-    
-    draw_text("Instrucoes:", font40, BLACK, display, 360, 120)
-    draw_text("1. No menu inicial, clique na tela para iniciar o desenho", font20, BLACK, display, 310, 200)
-    draw_text("2. Botão direito do mouse para desenhar as paredes do labirinto", font20, BLACK, display, 359, 230)
-    draw_text("3. Botão esquerdo do mouse para apagar as paredes do labirinto", font20, BLACK, display, 357, 260)
-    draw_text("4. Selecione o ponto de partida e de busca no desenho", font20, BLACK, display, 300, 290)
-    draw_text("5. Clique espaço para percorrer o menor caminho", font20, BLACK, display, 270, 320)
-    draw_text("6. Clique 'm' para alterar o modo de desenho para o modo de posição de inicio e fim", font20, BLACK, display, 458, 350)
-    draw_text("ção de inicio e fim", font20, BLACK, display, 100, 370)
-    draw_text("7. Clique 'A' para resetar os pontos de inicio e fim", font20, BLACK, display, 285, 400)
-    draw_text("8. Clique 'R' para resetar o caminho feito pelo algoritmo", font20, BLACK, display, 325, 430)
-    draw_text("v - voltar", font20, BLACK, display, 60, 460)
+
+    draw_text("Instrucoes:", font40, BLACK, display, 200, 120)
+    draw_text("1. No menu inicial, clique na tela para iniciar o desenho", font20, BLACK, display, 400, 200)
+    draw_text("2. Botão direito do mouse para desenhar as paredes do labirinto", font20, BLACK, display, 464, 230)
+    draw_text("3. Botão esquerdo do mouse para apagar as paredes do labirinto", font20, BLACK, display, 459, 260)
+    draw_text("4. Selecione o ponto de partida e de busca no desenho", font20, BLACK, display, 388, 290)
+    draw_text("5. Clique espaço para percorrer o menor caminho", font20, BLACK, display, 352, 320)
+    draw_text("6. Clique 'm' para alterar o modo de desenho para o modo de posição de inicio e fim", font20, BLACK, display, 584, 350)
+    draw_text("7. Clique 'A' para resetar os pontos de inicio e fim", font20, BLACK, display, 372, 380)
+    draw_text("8. Clique 'R' para resetar o caminho feito pelo algoritmo", font20, BLACK, display, 423, 410)
+    draw_text("v - voltar", font20, BLACK, display, 96, 470)
     for event in pygame.event.get():
       if event.type == pygame.QUIT:
         pygame.quit()
@@ -198,7 +192,7 @@ class Vortex:
     pygame.display.update()
   
   def draw_path_cell(self):
-    pygame.draw.rect(self.display, CIAN, (self.row, self.col, self.size, self.size), border_radius=5)
+    pygame.draw.rect(self.display, bg_color, (self.row, self.col, self.size, self.size), border_radius=5)
     pygame.display.update()
 
 
@@ -233,8 +227,6 @@ def dijkstra(node, end):
           i.previous = s
           i.color = WHITE
           i.draw_vortex()
-          # time.sleep(0.001)
-
   reset('path')
   
 
@@ -263,12 +255,12 @@ def reset(mode):
       if vertices[i][j].is_vortex:
         if mode == 'all':
           vertices[i][j].visited = False
-          vertices[i][j].color = CIAN
+          vertices[i][j].color = bg_color
           vertices[i][j].draw_vortex()
         elif mode == 'path':
           if vertices[i][j] not in caminho:
             vertices[i][j].visited = False
-            vertices[i][j].color = CIAN
+            vertices[i][j].color = bg_color
             vertices[i][j].draw_vortex()
           else:
             vertices[i][j].draw_path_cell()
