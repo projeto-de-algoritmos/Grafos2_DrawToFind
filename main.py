@@ -84,7 +84,6 @@ def draw_main_menu():
           reset('all')
         if event.key == pygame.K_m:
           draw_mode = not draw_mode
-          print(draw_mode)
         if event.key == pygame.K_a:
           existe_inicio = False
           existe_fim = False
@@ -133,8 +132,8 @@ def instructions():
 
     draw_text("Instrucoes:", font40, BLACK, display, 200, 120)
     draw_text("1. No menu inicial, clique na tela para iniciar o desenho", font20, BLACK, display, 400, 200)
-    draw_text("2. Botão direito do mouse para desenhar as paredes do labirinto", font20, BLACK, display, 464, 230)
-    draw_text("3. Botão esquerdo do mouse para apagar as paredes do labirinto", font20, BLACK, display, 459, 260)
+    draw_text("2. Botão esquerdo do mouse para desenhar as paredes do labirinto", font20, BLACK, display, 474, 230)
+    draw_text("3. Botão direito do mouse para apagar as paredes do labirinto", font20, BLACK, display, 449, 260)
     draw_text("4. Selecione o ponto de partida e de busca no desenho", font20, BLACK, display, 388, 290)
     draw_text("5. Clique espaço para percorrer o menor caminho", font20, BLACK, display, 352, 320)
     draw_text("6. Clique 'm' para alterar o modo de desenho para o modo de posição de inicio e fim", font20, BLACK, display, 584, 350)
